@@ -1,7 +1,9 @@
+import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {View, Text, FlatList} from 'react-native';
 import {FAB, List, Portal, Provider} from 'react-native-paper';
 import DashboardCard from '../../Components/Cards/DashboardCard';
+import Routes from '../../Navigation/Routes';
 import theme from '../../styles/theme';
 import styles from './Dashboard.style';
 
@@ -12,9 +14,19 @@ const deneme = [
 ];
 
 const Dashboard = props => {
+  const navigation = useNavigation();
+
   const [fabOpen, setFabOpen] = useState(false);
+
   const fabOpenChange = () => {
     setFabOpen(!fabOpen);
+  };
+
+  const handleGoExpense = () => {
+    navigation.navigate(Routes.EXPENSE);
+  };
+  const handleGoIncome = () => {
+    navigation.navigate(Routes.INCOME);
   };
 
   return (
@@ -32,15 +44,11 @@ const Dashboard = props => {
                   backgroundColor: 'red',
                 },
                 small: false,
-                onPress: () => console.log('Pressed Minus'),
+                onPress: handleGoExpense,
               },
             ]}
             onStateChange={fabOpenChange}
-            onPress={() => {
-              if (fabOpen) {
-                console.log('Pressed Add');
-              }
-            }}
+            onPress={fabOpen ? handleGoIncome : null}
           />
         </Portal>
         <DashboardCard
