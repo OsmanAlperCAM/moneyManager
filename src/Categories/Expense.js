@@ -1,0 +1,17 @@
+export default {
+  Bills: 'tag',
+  Car: 'car',
+  Clothes: 'tshirt-crew',
+  Communications: 'phone',
+  Eating_Out: 'silverware-fork-knife',
+  Entertainment: 'drama-masks',
+  Food: 'food',
+  Gifts: 'gift',
+  Health: 'doctor',
+  House: 'home-outline',
+  Pets: 'dog-side',
+  Sports: 'fitness-center',
+  Taxi: 'taxi',
+  Toiletry: 'toothbrush-paste',
+  Transport: 'train',
+};
