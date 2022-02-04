@@ -1,18 +1,72 @@
 import React, {useState} from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, FlatList} from 'react-native';
+import {useDispatch} from 'react-redux';
+import DatePicker from 'react-native-date-picker';
 import Input from '../../../Components/Input';
+import ExpenseCategory from '../../../Categories/Expense';
+import theme from '../../../styles/theme';
 import styles from './Expense.style';
+import CategoryCard from '../../../Components/Cards/CategoryCard';
+
+import {useNavigation} from '@react-navigation/native';
 
 const Expense = props => {
+  const [amount, setAmount] = useState(0);
+  const [note, setNote] = useState('');
+  const [category, setCategory] = useState({});
+  const [date, setDate] = useState(new Date());
+
+  const dispatch = useDispatch();
+
+  const navigation = useNavigation();
+
+  const handleSave = category => {
+    navigation.goBack();
+    dispatch({
+      type: 'ADD',
+      payload: {
+        process: {
+          amount,
+          note,
+          date: date.toISOString(),
+        },
+      },
+    });
+    console.log(date);
+  };
+
+  const renderCategory = ({item}) => {
+    return (
+      <CategoryCard
+        label={item.label}
+        icon={item.icon}
+        variant="expense"
+        onPress={() => handleSave(item)}
+      />
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Input
         label="Amount"
-        onChangeText={console.log}
+        onChangeText={setAmount}
         keyboardType="number-pad"
       />
-      <Input label="Note" onChangeText={console.log} />
-      <Text>Expense</Text>
+      <Input label="Note" onChangeText={setNote} />
+      <DatePicker
+        style={styles.datePicker}
+        androidVariant={'nativeAndroid'}
+        textColor={theme.primary.color}
+        mode="date"
+        date={date}
+        onDateChange={setDate}
+      />
+      <FlatList
+        data={ExpenseCategory}
+        renderItem={renderCategory}
+        numColumns={3}
+      />
     </View>
   );
 };
