@@ -5,12 +5,13 @@ import {useSelector} from 'react-redux';
 import {FAB, List, Portal, Provider} from 'react-native-paper';
 import DashboardCard from '../../Components/Cards/DashboardCard';
 import Routes from '../../Navigation/Routes';
-import theme from '../../styles/theme';
 import styles from './Dashboard.style';
 
 const Dashboard = props => {
   const navigation = useNavigation();
   const list = useSelector(state => state.dailyProcess);
+  const expense = useSelector(state => state.expense);
+  const balance = useSelector(state => state.balance);
 
   const [fabOpen, setFabOpen] = useState(false);
 
@@ -25,6 +26,14 @@ const Dashboard = props => {
     navigation.navigate(Routes.INCOME);
   };
 
+  const renderList = ({item}) => {
+    console.log('item', item);
+    return (
+      <List.Accordion title={list[item].date.split('T')[0]} id="1">
+        <List.Item title={list[item].amount} />
+      </List.Accordion>
+    );
+  };
   return (
     <Provider>
       <View style={styles.container}>
@@ -50,21 +59,11 @@ const Dashboard = props => {
         <DashboardCard
           title="Wallet"
           content="10000"
-          expense={1650}
+          expense={expense}
           income={1650}
-          cashFlow={0}
+          cashFlow={balance}
         />
-        <FlatList
-          data={list}
-          renderItem={({item}) => {
-            console.log('item', item);
-            return (
-              <List.Accordion title={item.date.split('T')[0]} id="1">
-                <List.Item title={item.amount} />
-              </List.Accordion>
-            );
-          }}
-        />
+        <FlatList data={Object.keys(list)} renderItem={renderList} />
       </View>
     </Provider>
   );

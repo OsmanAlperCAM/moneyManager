@@ -4,7 +4,14 @@ export default (state, action) => {
       console.log('ADD', action.payload.process);
       return {
         ...state,
-        dailyProcess: [...state.dailyProcess, action.payload.process],
+        dailyProcess: {...state.dailyProcess, ...action.payload.process},
+      };
+    }
+    case 'EXPENSE': {
+      return {
+        ...state,
+        expense: state.expense - action.payload.amount,
+        balance: state.balance - action.payload.amount,
       };
     }
     default:

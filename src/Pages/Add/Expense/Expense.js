@@ -13,7 +13,6 @@ import {useNavigation} from '@react-navigation/native';
 const Expense = props => {
   const [amount, setAmount] = useState(0);
   const [note, setNote] = useState('');
-  const [category, setCategory] = useState({});
   const [date, setDate] = useState(new Date());
 
   const dispatch = useDispatch();
@@ -22,14 +21,27 @@ const Expense = props => {
 
   const handleSave = category => {
     navigation.goBack();
+    console.log({
+      [date.toISOString()]: {amount, note, date: date.toISOString()},
+    });
     dispatch({
       type: 'ADD',
       payload: {
         process: {
-          amount,
-          note,
-          date: date.toISOString(),
+          [date.toISOString()]: {
+            amount,
+            note,
+            date: date.toISOString(),
+            category,
+            isExpense: true,
+          },
         },
+      },
+    });
+    dispatch({
+      type: 'EXPENSE',
+      payload: {
+        amount,
       },
     });
     console.log(date);
