@@ -1,10 +1,10 @@
 import React, {useEffect} from 'react';
-import {View, Text, ActivityIndicator} from 'react-native';
+import {View} from 'react-native';
+import {Button} from 'react-native-paper';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 import styles from './Auth.style';
-
-const reference = database().ref('/users/123');
+import theme from '../../styles/theme';
 
 const anonymousSignIn = async () => {
   const response = await auth().signInAnonymously();
@@ -19,12 +19,14 @@ const writeDatabase = async uid => {
 };
 
 const Auth = props => {
-  useEffect(() => {
-    anonymousSignIn();
-  }, []);
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" />
+      <Button
+        mode="contained"
+        onPress={anonymousSignIn}
+        color={theme.primary.color}>
+        Sign In
+      </Button>
     </View>
   );
 };

@@ -2,48 +2,48 @@ import React, {useState} from 'react';
 import {View, Text, FlatList} from 'react-native';
 import {useDispatch} from 'react-redux';
 import DatePicker from 'react-native-date-picker';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 import Input from '../../../Components/Input';
 import ExpenseCategory from '../../../Categories/Expense';
 import theme from '../../../styles/theme';
 import styles from './Expense.style';
 import CategoryCard from '../../../Components/Cards/CategoryCard';
 
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const Expense = props => {
   const [amount, setAmount] = useState(0);
   const [note, setNote] = useState('');
   const [date, setDate] = useState(new Date());
+  const route = useRoute();
+  const {expenseValue, balance} = route.params;
 
-  const dispatch = useDispatch();
-
+  let transactionRefference = database()
+    .ref(
+      `/Users/${auth().currentUser.uid}/Transactions/${
+        date.toISOString().split('T')[0]
+      }`,
+    )
+    .push();
   const navigation = useNavigation();
 
   const handleSave = category => {
     navigation.goBack();
-    console.log({
-      [date.toISOString()]: {amount, note, date: date.toISOString()},
+
+    transactionRefference.set({
+      amount,
+      category,
+      note,
+      date: date.toISOString(),
+      isExpense: true,
     });
-    dispatch({
-      type: 'ADD',
-      payload: {
-        process: {
-          [date.toISOString()]: {
-            amount,
-            note,
-            date: date.toISOString(),
-            category,
-            isExpense: true,
-          },
-        },
-      },
-    });
-    dispatch({
-      type: 'EXPENSE',
-      payload: {
-        amount,
-      },
-    });
+    database()
+      .ref(`/Users/${auth().currentUser.uid}`)
+      .update({
+        expense: Number(expenseValue) + Number(amount),
+        balance: balance - amount,
+      });
     console.log(date);
   };
 
