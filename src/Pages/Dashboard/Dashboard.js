@@ -11,6 +11,28 @@ import theme from '../../styles/theme';
 import ParseFirebaseData from '../../utils/ParseFirebaseData';
 import ListTile from '../../Components/ListTile';
 
+const renderList = ({item}) => {
+  return (
+    <List.Accordion title={item.id} titleStyle={{color: theme.primary.color}}>
+      {ParseFirebaseData(item)
+        .slice(1)
+        .map(element => {
+          return (
+            <ListTile
+              key={Math.random()}
+              title={element.category.label}
+              icon={element.category.icon}
+              amount={element.amount}
+              note={element.note}
+              date={element.date}
+              isExpense={element.isExpense}
+            />
+          );
+        })}
+    </List.Accordion>
+  );
+};
+
 const Dashboard = props => {
   const navigation = useNavigation();
   const [userData, setUserData] = useState({});
@@ -42,27 +64,6 @@ const Dashboard = props => {
       });
   }, []);
 
-  const renderList = ({item}) => {
-    return (
-      <List.Accordion title={item.id} titleStyle={{color: theme.primary.color}}>
-        {ParseFirebaseData(item)
-          .slice(1)
-          .map(element => {
-            return (
-              <ListTile
-                key={Math.random()}
-                title={element.category.label}
-                icon={element.category.icon}
-                amount={element.amount}
-                note={element.note}
-                date={element.date}
-                isExpense={element.isExpense}
-              />
-            );
-          })}
-      </List.Accordion>
-    );
-  };
   return (
     <Provider>
       <View style={styles.container}>

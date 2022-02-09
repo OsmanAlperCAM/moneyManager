@@ -20,7 +20,7 @@ const ListTile = ({title, icon, amount, note, date, isExpense = false}) => {
       )}
       right={props => (
         <View style={styles[variant].amountContainer}>
-          <Text style={styles[variant].amount}>${amount}</Text>
+          <Text style={styles[variant].amount}>{amount}$</Text>
           <Text style={styles[variant].amount}>
             {date.split('T')[1].split('.')[0]}
           </Text>

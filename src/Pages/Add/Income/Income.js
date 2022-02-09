@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, FlatList} from 'react-native';
+import {View, FlatList} from 'react-native';
 import {Snackbar} from 'react-native-paper';
 import DatePicker from 'react-native-date-picker';
 import auth from '@react-native-firebase/auth';
@@ -19,6 +19,7 @@ const Income = props => {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const route = useRoute();
   const {incomeValue, balance} = route.params;
+  const navigation = useNavigation();
 
   const transactionRefference = database()
     .ref(
@@ -27,27 +28,27 @@ const Income = props => {
       }`,
     )
     .push();
-  const navigation = useNavigation();
 
   const handleSave = async category => {
     if (amount == 0) {
       setSnackbarVisible(true);
       return;
     }
-
-    transactionRefference.set({
-      amount,
-      category,
-      note,
-      date: date.toISOString(),
-      isIncome: true,
-    });
-    await database()
-      .ref(`/Users/${auth().currentUser.uid}`)
-      .update({
-        income: Number(incomeValue) + Number(amount),
-        balance: Number(balance) + Number(amount),
+    try {
+      transactionRefference.set({
+        amount,
+        category,
+        note,
+        date: date.toISOString(),
+        isIncome: true,
       });
+      await database()
+        .ref(`/Users/${auth().currentUser.uid}`)
+        .update({
+          income: Number(incomeValue) + Number(amount),
+          balance: Number(balance) + Number(amount),
+        });
+    } catch (error) {}
     navigation.goBack();
   };
 

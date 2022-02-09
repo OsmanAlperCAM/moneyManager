@@ -26,7 +26,11 @@ const Navigation = () => {
             <Stack.Screen name={Routes.INCOME} component={Income} />
           </>
         ) : (
-          <Stack.Screen name={Routes.AUTH} component={Auth} />
+          <Stack.Screen
+            options={{headerShown: false}}
+            name={Routes.AUTH}
+            component={Auth}
+          />
         )}
       </Stack.Navigator>
     </NavigationContainer>

@@ -19,34 +19,36 @@ const Expense = props => {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const route = useRoute();
   const {expenseValue, balance} = route.params;
+  const navigation = useNavigation();
 
-  let transactionRefference = database()
+  const transactionRefference = database()
     .ref(
       `/Users/${auth().currentUser.uid}/Transactions/${
         date.toISOString().split('T')[0]
       }`,
     )
     .push();
-  const navigation = useNavigation();
 
   const handleSave = async category => {
     if (amount == 0) {
       setSnackbarVisible(true);
       return;
     }
-    transactionRefference.set({
-      amount,
-      category,
-      note,
-      date: date.toISOString(),
-      isExpense: true,
-    });
-    await database()
-      .ref(`/Users/${auth().currentUser.uid}`)
-      .update({
-        expense: Number(expenseValue) + Number(amount),
-        balance: balance - amount,
+    try {
+      transactionRefference.set({
+        amount,
+        category,
+        note,
+        date: date.toISOString(),
+        isExpense: true,
       });
+      await database()
+        .ref(`/Users/${auth().currentUser.uid}`)
+        .update({
+          expense: Number(expenseValue) + Number(amount),
+          balance: balance - amount,
+        });
+    } catch (error) {}
     navigation.goBack();
   };
 
