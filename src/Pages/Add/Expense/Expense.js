@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, FlatList} from 'react-native';
-import {useDispatch} from 'react-redux';
+import {Snackbar} from 'react-native-paper';
 import DatePicker from 'react-native-date-picker';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
@@ -16,6 +16,7 @@ const Expense = props => {
   const [amount, setAmount] = useState(0);
   const [note, setNote] = useState('');
   const [date, setDate] = useState(new Date());
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
   const route = useRoute();
   const {expenseValue, balance} = route.params;
 
@@ -28,9 +29,11 @@ const Expense = props => {
     .push();
   const navigation = useNavigation();
 
-  const handleSave = category => {
-    navigation.goBack();
-
+  const handleSave = async category => {
+    if (amount == 0) {
+      setSnackbarVisible(true);
+      return;
+    }
     transactionRefference.set({
       amount,
       category,
@@ -38,13 +41,13 @@ const Expense = props => {
       date: date.toISOString(),
       isExpense: true,
     });
-    database()
+    await database()
       .ref(`/Users/${auth().currentUser.uid}`)
       .update({
         expense: Number(expenseValue) + Number(amount),
         balance: balance - amount,
       });
-    console.log(date);
+    navigation.goBack();
   };
 
   const renderCategory = ({item}) => {
@@ -60,6 +63,14 @@ const Expense = props => {
 
   return (
     <View style={styles.container}>
+      <Snackbar
+        duration={2000}
+        visible={snackbarVisible}
+        onDismiss={() => {
+          setSnackbarVisible(false);
+        }}>
+        Amount value cannot be left blank
+      </Snackbar>
       <Input
         label="Amount"
         onChangeText={setAmount}

@@ -1,17 +1,19 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, FlatList} from 'react-native';
-import {useSelector} from 'react-redux';
 import {FAB, List, Portal, Provider} from 'react-native-paper';
+import auth from '@react-native-firebase/auth';
+import database from '@react-native-firebase/database';
 import DashboardCard from '../../Components/Cards/DashboardCard';
 import Routes from '../../Navigation/Routes';
 import styles from './Dashboard.style';
+import theme from '../../styles/theme';
+import ParseFirebaseData from '../../utils/ParseFirebaseData';
+import ListTile from '../../Components/ListTile';
 
 const Dashboard = props => {
   const navigation = useNavigation();
-  const list = useSelector(state => state.dailyProcess);
-  const expense = useSelector(state => state.expense);
-  const balance = useSelector(state => state.balance);
+  const [userData, setUserData] = useState({});
 
   const [fabOpen, setFabOpen] = useState(false);
 
@@ -20,17 +22,44 @@ const Dashboard = props => {
   };
 
   const handleGoExpense = () => {
-    navigation.navigate(Routes.EXPENSE);
+    navigation.navigate(Routes.EXPENSE, {
+      expenseValue: userData.expense,
+      balance: userData.balance,
+    });
   };
   const handleGoIncome = () => {
-    navigation.navigate(Routes.INCOME);
+    navigation.navigate(Routes.INCOME, {
+      incomeValue: userData.income,
+      balance: userData.balance,
+    });
   };
 
+  useEffect(() => {
+    database()
+      .ref(`/Users/${auth().currentUser.uid}`)
+      .on('value', snapshot => {
+        setUserData(snapshot.val());
+      });
+  }, []);
+
   const renderList = ({item}) => {
-    console.log('item', item);
     return (
-      <List.Accordion title={list[item].date.split('T')[0]} id="1">
-        <List.Item title={list[item].amount} />
+      <List.Accordion title={item.id} titleStyle={{color: theme.primary.color}}>
+        {ParseFirebaseData(item)
+          .slice(1)
+          .map(element => {
+            return (
+              <ListTile
+                key={Math.random()}
+                title={element.category.label}
+                icon={element.category.icon}
+                amount={element.amount}
+                note={element.note}
+                date={element.date}
+                isExpense={element.isExpense}
+              />
+            );
+          })}
       </List.Accordion>
     );
   };
@@ -58,12 +87,14 @@ const Dashboard = props => {
         </Portal>
         <DashboardCard
           title="Wallet"
-          content="10000"
-          expense={expense}
-          income={1650}
-          cashFlow={balance}
+          expense={userData.expense}
+          income={userData.income}
+          balance={userData.balance}
         />
-        <FlatList data={Object.keys(list)} renderItem={renderList} />
+        <FlatList
+          data={ParseFirebaseData(userData.Transactions)}
+          renderItem={renderList}
+        />
       </View>
     </Provider>
   );
